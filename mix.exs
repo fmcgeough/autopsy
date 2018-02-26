@@ -41,7 +41,8 @@ defmodule Autopsy.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.15.0"},
       {:cowboy, "~> 1.0"},
-      {:jira, "~> 0.0.8"}
+      {:jira, "~> 0.0.8"},
+      {:google_api_calendar, "~> 0.0.1"}
     ]
   end
 
