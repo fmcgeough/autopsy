@@ -3,15 +3,24 @@ defmodule Autopsy.DivisionFieldDefinition do
     Define the "division_field_definitions" table schema
 
     Each row stores a map defining what it is that a
-    particular division wishes to capture in a PostMortem.
+    particular division wishes to capture in a PostMortem and
+    the levels of severity for issues.
 
-    The format of the map is:
+    The format of the field_definitions map is:
 
     %{division_field_definitions: [%{
       id: "what-happened",
       title: "What Happened?",
-      "type: "text",
-      order: 1
+      type: "text",
+      order: 1,
+      enabled: true
+      }]
+    }
+
+    The format of the severity_definitions map is:
+    %{severity_definitions: [%{
+      "value" => 1,
+      "description" => "P1 (Critical) - A complete loss or serious impairment..."
       }]
     }
 
@@ -21,12 +30,14 @@ defmodule Autopsy.DivisionFieldDefinition do
     type: "text" (only) right now. we will define a select type down the line.
     order: what order this field should appear in the UI. This is after all the
            fixed fields. If two orders match the order they appear is arbitrary.
+    enabled: true or false. Indicates whether we should consider this field definition.
   """
   use Ecto.Schema
   alias Autopsy.Division
 
   schema("division_field_definitions") do
     field(:field_definitions, :map)
+    field(:severity_definitions, :map)
 
     belongs_to(:division, Division)
 

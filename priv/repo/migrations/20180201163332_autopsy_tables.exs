@@ -47,6 +47,7 @@ defmodule Autopsy.Repo.Migrations.AutopsyTables do
     create table(:division_field_definitions) do
       add(:division_id, references(:divisions, on_delete: :delete_all), null: false)
       add(:field_definitions, :map)
+      add(:severity_definitions, :map)
 
       timestamps()
     end

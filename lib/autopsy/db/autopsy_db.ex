@@ -60,8 +60,8 @@ defmodule Autopsy.AutopsyDb do
          attrs
        ) do
     division_field_definition
-    |> cast(attrs, [:field_definitions, :division_id])
-    |> validate_required([:field_definitions, :division_id])
+    |> cast(attrs, [:field_definitions, :division_id, :severity_definitions])
+    |> validate_required([:field_definitions, :division_id, :severity_definitions])
   end
 
   defp division_base_query do
