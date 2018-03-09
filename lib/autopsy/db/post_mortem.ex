@@ -3,7 +3,7 @@ defmodule Autopsy.PostMortem do
   Define the "postmortems" table schema
   """
   use Ecto.Schema
-  alias Autopsy.Image
+  alias Autopsy.{Image, Division}
 
   schema "postmortems" do
     field(:title, :string)
@@ -18,6 +18,7 @@ defmodule Autopsy.PostMortem do
 
     timestamps()
 
+    belongs_to(:division, Division)
     has_many(:images, Image)
   end
 end
