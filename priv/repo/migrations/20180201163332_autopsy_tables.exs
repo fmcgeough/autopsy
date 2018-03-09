@@ -4,6 +4,7 @@ defmodule Autopsy.Repo.Migrations.AutopsyTables do
   def change do
     create table(:divisions) do
       add(:division_name, :string, null: false)
+      add(:ui_definitions, :map)
 
       timestamps()
     end
@@ -35,6 +36,8 @@ defmodule Autopsy.Repo.Migrations.AutopsyTables do
       add(:title, :string, null: false)
       add(:deleted, :boolean)
 
+      add(:division_id, references(:divisions, on_delete: :delete_all), null: false)
+
       timestamps()
     end
 
@@ -42,14 +45,6 @@ defmodule Autopsy.Repo.Migrations.AutopsyTables do
       add(:post_mortem_id, references(:post_mortems, on_delete: :delete_all), null: false)
       add(:tag_id, references(:tags, on_delete: :delete_all), null: false)
       add(:deleted, :boolean)
-
-      timestamps()
-    end
-
-    create table(:division_field_definitions) do
-      add(:division_id, references(:divisions, on_delete: :delete_all), null: false)
-      add(:field_definitions, :map)
-      add(:severity_definitions, :map)
 
       timestamps()
     end

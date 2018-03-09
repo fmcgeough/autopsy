@@ -4,7 +4,12 @@ defmodule Autopsy.AutopsyDb do
   """
   import Ecto.{Query, Changeset}, warn: false
   alias Autopsy.{Repo}
-  alias Autopsy.{Division, DivisionFieldDefinition}
+  alias Autopsy.{Division, Tag, PostMortemTag, PostMortem}
+
+  def list_post_mortems_for_division(id) do
+    from(p in post_mortem_base_query(), where: p.division_id == ^id)
+    |> Repo.all()
+  end
 
   @doc """
     Return divisions setup in the database.
@@ -27,19 +32,6 @@ defmodule Autopsy.AutopsyDb do
   end
 
   @doc """
-    Create a DivisionFieldDefinition row in db.
-
-  ## Examples
-      iex> create_division_field_definition(%{field: value})
-      {:ok, %DivisionFieldDefinition{}}
-  """
-  def create_division_field_definition(attrs \\ %{}) do
-    %DivisionFieldDefinition{}
-    |> division_field_definition_changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
     Return the Division uniquely identified by a name.
 
     Returns nil if no result was found. Raises if more than one entry.
@@ -49,26 +41,52 @@ defmodule Autopsy.AutopsyDb do
     |> Repo.one()
   end
 
-  defp division_changeset(%Division{} = division, attrs) do
-    division
-    |> cast(attrs, [:division_name])
-    |> validate_required([:division_name])
+  def create_tag(attrs \\ %{}) do
+    %Tag{}
+    |> tag_changeset(attrs)
+    |> Repo.insert()
   end
 
-  defp division_field_definition_changeset(
-         %DivisionFieldDefinition{} = division_field_definition,
-         attrs
-       ) do
-    division_field_definition
-    |> cast(attrs, [:field_definitions, :division_id, :severity_definitions])
-    |> validate_required([:field_definitions, :division_id, :severity_definitions])
+  def create_post_mortem_tag(attrs \\ %{}) do
+    %PostMortemTag{}
+    |> post_mortem_tag_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  defp division_changeset(%Division{} = division, attrs) do
+    division
+    |> cast(attrs, [:division_name, :ui_definitions])
+    |> validate_required([:division_name, :ui_definitions])
+  end
+
+  defp tag_changeset(%Tag{} = tag, attrs) do
+    tag
+    |> cast(attrs, [:title, :deleted, :division_id])
+    |> validate_required([:title, :division_id])
+  end
+
+  defp post_mortem_tag_changeset(%PostMortemTag{} = post_mortem_tag, attrs) do
+    post_mortem_tag
+    |> cast(attrs, [:post_mortem_id, :tag_id])
+    |> validate_required([:post_mortem_id, :tag_id])
   end
 
   defp division_base_query do
+    from(d in Division, left_join: t in assoc(d, :tags))
+  end
+
+  defp post_mortem_base_query do
     from(
-      d in Division,
-      left_join: f in assoc(d, :division_field_definition),
-      preload: [division_field_definition: d]
+      p in PostMortem,
+      join: division in assoc(p, :division),
+      left_join: images in assoc(p, :images),
+      left_join: post_mortem_tags in assoc(p, :post_mortem_tags),
+      left_join: tag in assoc(post_mortem_tags, :tag),
+      preload: [
+        division: division,
+        images: images,
+        post_mortem_tags: {post_mortem_tags, tag: tag}
+      ]
     )
   end
 end
